@@ -5,7 +5,4 @@ My neovim config, as a package. This way I can just add the following to
 
 ```lua
 vim.pack.add({"https://github.com/audy/audy.nvim"})
-
---- setup() adds more dependencies
-require("audy").setup()
 ```
