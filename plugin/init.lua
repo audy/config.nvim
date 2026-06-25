@@ -112,6 +112,7 @@ vim.pack.add({
   { src = "https://github.com/nvimtools/none-ls.nvim" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   { src = "https://github.com/linrongbin16/gitlinker.nvim" },
+  { src = "https://github.com/sindrets/diffview.nvim" },
 --  { src = "https://github.com/OXY2DEV/markview.nvim" },
 })
 
@@ -138,13 +139,26 @@ vim.pack.add({
 -- ================================
 
 -- gitsigns
-vim.keymap.set('n', '<leader>gb', require('gitsigns').blame_line, { desc = 'Git blame line' })
+require('gitsigns').setup()
+local gs = require('gitsigns')
+vim.keymap.set('n', '<leader>gb', gs.blame_line, { desc = 'Git blame line' })
+vim.keymap.set('n', ']c', function() gs.nav_hunk('next') end, { desc = 'Next hunk' })
+vim.keymap.set('n', '[c', function() gs.nav_hunk('prev') end, { desc = 'Prev hunk' })
+vim.keymap.set('n', '<leader>gs', gs.stage_hunk, { desc = 'Stage hunk' })
+vim.keymap.set('n', '<leader>gr', gs.reset_hunk, { desc = 'Reset hunk' })
+vim.keymap.set('n', '<leader>gp', gs.preview_hunk, { desc = 'Preview hunk' })
+vim.keymap.set('n', '<leader>gu', gs.undo_stage_hunk, { desc = 'Undo stage hunk' })
 
 -- gitlinker
 vim.keymap.set({'n', 'v'}, '<leader>gl', '<cmd>GitLink<cr>', { desc = 'Yank git link' })
 vim.keymap.set({'n', 'v'}, '<leader>gL', '<cmd>GitLink!<cr>', { desc = 'Open git link in browser' })
 
+-- diffview
+vim.keymap.set('n', '<leader>gd', '<cmd>DiffviewOpen<cr>', { desc = 'Diffview open' })
+vim.keymap.set('n', '<leader>gD', '<cmd>DiffviewClose<cr>', { desc = 'Diffview close' })
+
 require("scrollbar").setup()
+require("scrollbar.handlers.gitsigns").setup()
 
 require('telescope').setup({
   defaults = {
