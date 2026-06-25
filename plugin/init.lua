@@ -448,3 +448,7 @@ vim.keymap.set('n', '<C-L>', ':Oil<CR>')
 
 -- Neotree
 vim.keymap.set('n', '<C-T>', ':Neotree toggle show<CR>')
+vim.keymap.set('n', '<leader>tg', ':Neotree git_status<CR>')
+vim.keymap.set('n', '<leader>tb', ':Neotree buffers<CR>')
+vim.keymap.set('n', '<leader>tr', ':Neotree reveal<CR>')
+vim.keymap.set('n', '<leader>tf', ':Neotree float<CR>')
