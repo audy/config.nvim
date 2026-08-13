@@ -62,16 +62,12 @@ vim.opt.directory = vim.fn.expand('~/.vim/tmp/swap//')
 vim.opt.shortmess = vim.o.shortmess .. 'F'
 
 -- Don't fold anything by default
-vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 99
+-- vim.opt.foldlevel = 99
+-- vim.opt.foldlevelstart = 99
 
 -- Appearance & Syntax
 
 vim.cmd('syntax enable')
-
--- Highlight non-ASCII characters
-vim.cmd('syntax match nonascii "[^\\x00-\\x7F]"')
-vim.cmd('highlight nonascii guibg=Red ctermbg=2')
 
 -- Status line styling
 vim.cmd(":hi statusline guibg=NONE")
@@ -138,6 +134,24 @@ vim.pack.add({
 -- PLUGIN CONFIGURATION
 -- ================================
 
+
+-- treesitter (folding/highlighting)
+require('nvim-treesitter').setup()
+require('nvim-treesitter').install { 'lua', 'python', 'rust', 'markdown', 'bash', 'dockerfile', 'json', 'javascript' }
+
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function()
+    pcall(vim.treesitter.start)
+      vim.wo[0][0].foldmethod = 'expr'
+      vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  end,
+})
+
+vim.o.foldlevelstart = 99  -- everything open when a file opens
+vim.o.foldtext = ''        -- keep syntax colors on the folded line
+vim.o.foldcolumn = '1'     -- gutter showing where folds are
+
+
 -- gitsigns
 require('gitsigns').setup()
 local gs = require('gitsigns')
@@ -145,7 +159,9 @@ vim.keymap.set('n', '<leader>gb', gs.blame_line, { desc = 'Git blame line' })
 vim.keymap.set('n', ']c', function() gs.nav_hunk('next') end, { desc = 'Next hunk' })
 vim.keymap.set('n', '[c', function() gs.nav_hunk('prev') end, { desc = 'Prev hunk' })
 vim.keymap.set('n', '<leader>gs', gs.stage_hunk, { desc = 'Stage hunk' })
+vim.keymap.set('v', '<leader>gs', function() gs.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') }) end, { desc = 'Stage selection' })
 vim.keymap.set('n', '<leader>gr', gs.reset_hunk, { desc = 'Reset hunk' })
+vim.keymap.set('v', '<leader>gr', function() gs.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') }) end, { desc = 'Reset selection' })
 vim.keymap.set('n', '<leader>gp', gs.preview_hunk, { desc = 'Preview hunk' })
 vim.keymap.set('n', '<leader>gu', gs.undo_stage_hunk, { desc = 'Undo stage hunk' })
 
@@ -183,33 +199,6 @@ require('telescope').setup({
     },
   }
 })
-
--- require("nvim-treesitter.configs").setup({
---   highlight = { enable = true },
---   auto_install = true,
---   disable = function(lang, buf)
---     local max_filesize = 1024 * 1024 -- 1MiB
---     local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
---     if ok and stats and stats.size > max_filesize then
---       return true
---     end
---   end,
---   refactor = {
---     highlight_definitions = { enable = true },
---     highlight_current_scope = { enable = false },
---     smart_rename = {
---       enable = true,
---       -- Assign keymaps to false to disable them, e.g. `smart_rename = false`.
---       keymaps = {
---         smart_rename = "grr",
---       },
---     },
---   },
---   fold = { enabled = true },
--- })
-
--- Use groovy treesitter as stand-in for nextflow
-vim.treesitter.language.register("groovy", "nf")
 
 require("oil").setup({
   columns = {
@@ -397,7 +386,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- ================================
 
 -- `Conf`: Open Neovim config
-vim.api.nvim_command('command! Conf execute "tabe ~/.config/nvim/init.lua"')
+vim.api.nvim_command('command! Conf execute "tabe ~/Code/config.nvim/plugin/init.lua"')
 
 -- `Imports`: (Python) Sort imports
 vim.api.nvim_create_user_command("Imports", function()
@@ -449,13 +438,6 @@ vim.keymap.set('n', '<leader>jr', '<cmd>Telescope lsp_references<cr>')
 vim.keymap.set('n', '<leader>ji', '<cmd>Telescope lsp_implementations<cr>')
 vim.keymap.set('n', '<leader>jt', '<cmd>Telescope lsp_type_definitions<cr>')
 vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files no_ignore=false<cr>')
-
-
--- Folding
--- vim.keymap.set('n', '<leader>zf', 'zfa{', { desc = 'Fold current block' })
--- vim.keymap.set('n', '<leader>zl', 'zM', { desc = '[F]old everything at current [l]evel' })
--- vim.keymap.set('n', '<leader>zu', 'zR', { desc = '[U]nfold eve[r]ything' })
--- vim.keymap.set('n', '<leader>za', 'zM', { desc = '[F]old everything[M]' })
 
 -- Oil
 vim.keymap.set('n', '<C-L>', ':Oil<CR>')
